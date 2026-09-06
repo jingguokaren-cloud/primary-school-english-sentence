@@ -181,5 +181,185 @@ const nceSentences = {
       { en: "What do you do in the hallway?", cn: "你在走廊里的时候会怎么做？" },
       { en: "I keep to the right.", cn: "我靠右行走。" }
     ]
+  },
+  9: {
+    title: "四上 Unit 1",
+    phrases: [
+      { en: "go ahead", cn: "请自便" },
+      { en: "show you around", cn: "带你参观" },
+      { en: "have a look", cn: "看一看" },
+      { en: "a cup of tea", cn: "一杯茶" },
+      { en: "over there", cn: "在那边" }
+    ],
+    sentences: [
+      { en: "Come on in, please.", cn: "请进。" },
+      { en: "Have a seat, please.", cn: "请坐。" },
+      { en: "These are for you.", cn: "这些是给你的。" },
+      { en: "Can I get you a drink?", cn: "要喝点什么吗？" },
+      { en: "Thanks. Water is fine.", cn: "谢谢。我喝水就可以。" },
+      { en: "Can I use the bathroom?", cn: "我能用一下卫生间吗？" },
+      { en: "Sure! The bathroom is over there.", cn: "没问题！卫生间在那边。" },
+      { en: "May I have a look?", cn: "我能看看吗？" },
+      { en: "Goodbye! / Bye-bye!", cn: "再见！" }
+    ]
+  },
+  10: {
+    title: "四上 Unit 2",
+    phrases: [
+      { en: "pick it up", cn: "把它捡起来" },
+      { en: "at the end of dinner", cn: "在晚餐结束时" },
+      { en: "try some fish", cn: "尝尝鱼肉" },
+      { en: "have some rice", cn: "盛些米饭" }
+    ],
+    sentences: [
+      { en: "Help yourself.", cn: "请自便。" },
+      { en: "Would you like some rice?", cn: "你想来点米饭吗？" },
+      { en: "No, thanks. I'm good.", cn: "不了，谢谢。我吃饱了。" },
+      { en: "Can I have some more soup, please?", cn: "请问能再给我盛些汤吗？" },
+      { en: "The food is so good.", cn: "食物真美味。" },
+      { en: "I'm glad you like it.", cn: "很高兴你喜欢它。" },
+      { en: "Could you please pass me the tissues?", cn: "能请你把纸巾递给我吗？" },
+      { en: "Here you are.", cn: "给你。" }
+    ]
+  },
+  11: {
+    title: "四上 Unit 3",
+    phrases: [
+      { en: "add the greens", cn: "加入蔬菜" },
+      { en: "add some water", cn: "加水" },
+      { en: "add the noodles", cn: "加入面条" },
+      { en: "wash the greens", cn: "洗菜" },
+      { en: "stir the noodles", cn: "搅拌面条" },
+      { en: "come up to the top", cn: "浮到表面" },
+      { en: "be careful with fire", cn: "小心用火" }
+    ],
+    sentences: [
+      { en: "How do you cook noodles?", cn: "你怎么煮面条？" },
+      { en: "First, ...", cn: "首先，……" },
+      { en: "Next, ...", cn: "接下来，……" },
+      { en: "Then, ...", cn: "然后，……" },
+      { en: "Last, ...", cn: "最后，……" },
+      { en: "What else?", cn: "还有别的吗？" },
+      { en: "How do we do this?", cn: "我们该怎么做呢？" },
+      { en: "Let me show you.", cn: "看我怎么做。" },
+      { en: "Maybe we can/should ... first, and then ...", cn: "也许我们可以/应该先……后……" },
+      { en: "How about ...?", cn: "……如何？" },
+      { en: "For example, ...", cn: "例如，……" }
+    ]
+  },
+  12: {
+    title: "四上 Unit 4",
+    phrases: [
+      { en: "do chores", cn: "做家务" },
+      { en: "sweep the floor", cn: "扫地" },
+      { en: "put away the dishes", cn: "收盘子" },
+      { en: "clean the table", cn: "擦桌子" },
+      { en: "wash the dishes", cn: "洗碗" },
+      { en: "take out the rubbish", cn: "倒垃圾" },
+      { en: "clear the table", cn: "收拾桌子" },
+      { en: "clean up", cn: "打扫" },
+      { en: "look dirty", cn: "看起来脏" },
+      { en: "put away the leftovers", cn: "收拾剩菜" }
+    ],
+    sentences: [
+      { en: "How can we clean ... up?", cn: "我们如何把……清理干净？" }
+    ]
+  },
+  13: {
+    title: "四上 Unit 5",
+    phrases: [
+      { en: "smile and say hi to others", cn: "微笑着和别人打招呼" },
+      { en: "cheer up a friend", cn: "让朋友高兴起来" },
+      { en: "be ready to help", cn: "准备好帮忙" },
+      { en: "give a helping hand", cn: "帮助" },
+      { en: "ask others to join in", cn: "邀请他人加入" },
+      { en: "work hard", cn: "努力学习" }
+    ],
+    sentences: [
+      { en: "He/She likes to ...", cn: "他/她喜欢……" },
+      { en: "He/She is always ready to ...", cn: "他/她总是准备好去……" },
+      { en: "I think ... is so kind.", cn: "我觉得……很善良。" }
+    ]
+  },
+  14: {
+    title: "四上 Unit 6",
+    phrases: [
+      { en: "a baby sister", cn: "一个小妹妹" },
+      { en: "say nice words", cn: "说赞美的语言" },
+      { en: "give a gift", cn: "送礼物" },
+      { en: "spend one-on-one time", cn: "花时间单独相处" },
+      { en: "help out", cn: "帮忙" },
+      { en: "buy a birthday cake", cn: "买一个生日蛋糕" },
+      { en: "read a book", cn: "读一本书" },
+      { en: "cook together", cn: "一起做饭" },
+      { en: "cook birthday noodles", cn: "煮生日面" },
+      { en: "take a walk", cn: "散步" },
+      { en: "sing a song", cn: "唱歌" }
+    ],
+    sentences: [
+      { en: "say \"Happy birthday!\"", cn: "说“生日快乐！”" },
+      { en: "What can I do?", cn: "我可以做什么呢？" }
+    ]
+  },
+  15: {
+    title: "四上 Unit 7",
+    phrases: [
+      { en: "IT worker", cn: "信息技术工作者" },
+      { en: "taxi driver", cn: "出租车司机" },
+      { en: "go to work/school", cn: "去上班/上学" },
+      { en: "come home", cn: "回家" },
+      { en: "in the morning", cn: "在早晨" },
+      { en: "in the afternoon", cn: "在下午" },
+      { en: "in the evening", cn: "在晚上" },
+      { en: "exercise together", cn: "一起锻炼" },
+      { en: "play a game", cn: "玩游戏" },
+      { en: "go for a walk", cn: "外出散步" }
+    ],
+    sentences: [
+      { en: "What does ... do?", cn: "……（谁）是做什么工作的？" },
+      { en: "Why don't you ...?", cn: "为什么不……？" },
+      { en: "I think you can ...", cn: "我觉得你可以……" },
+      { en: "Maybe you ...", cn: "也许你可以……" },
+      { en: "He/She is ...", cn: "他/她是……（职业）" },
+      { en: "When does he/she ...?", cn: "他/她什么时候……（活动）？" },
+      { en: "He/She ... at ...", cn: "他/她在……（时间）……（活动）" }
+    ]
+  },
+  16: {
+    title: "四上 Unit 8",
+    phrases: [
+      { en: "watch fireworks", cn: "看烟花" },
+      { en: "eat mooncakes", cn: "吃月饼" },
+      { en: "visit family and friends", cn: "拜访家人和朋友" },
+      { en: "give out gifts", cn: "分发礼物" },
+      { en: "make rice dumplings", cn: "包粽子" },
+      { en: "have a big meal", cn: "吃大餐" },
+      { en: "best wishes", cn: "最好的祝愿" },
+      { en: "Dragon Boat Festival", cn: "端午节" },
+      { en: "Mid-Autumn Festival", cn: "中秋节" },
+      { en: "New Year", cn: "新年" },
+      { en: "Spring Festival", cn: "春节" },
+      { en: "Lantern Festival", cn: "元宵节" },
+      { en: "Water Festival", cn: "泼水节" }
+    ],
+    sentences: [
+      { en: "Happy New Year!", cn: "新年快乐！" },
+      { en: "Wish you all the best!", cn: "祝你一切顺利！" },
+      { en: "My favourite festival is ... On that day, we ...", cn: "我最喜欢的节日是……那一天，我们……" },
+      { en: "I like ... the most.", cn: "我最喜欢……" }
+    ]
+  },
+  17: {
+    title: "四上 Review",
+    phrases: [
+      { en: "a baby elephant", cn: "一个大象宝宝" },
+      { en: "take photos of animals", cn: "给动物摄影" },
+      { en: "a big playground", cn: "一个大操场" },
+      { en: "add seasoning", cn: "添加调料" }
+    ],
+    sentences: [
+      { en: "What classes do you have?", cn: "你们有什么课？" },
+      { en: "What's your favourite subject?", cn: "你最喜欢的科目是什么？" }
+    ]
   }
 };

@@ -54,7 +54,6 @@
   // Word mode
   let selectedLesson = 1;
   let selectedFavLesson = 'all'; // 'all' or a lesson key number
-  let selectedType = 'phrases'; // 'phrases' | 'sentences'
 
   // Track if current word had any errors (for auto-add to favorites)
   let currentWordHadError = false;
@@ -199,6 +198,19 @@
     setTimeout(() => keyEl.classList.remove('correct-flash', 'wrong-flash'), 300);
   }
 
+  function shouldAutoSkipCharacter(char) {
+    return !/[A-Za-z]/.test(char);
+  }
+
+  function advanceAutoSkippedCharacters() {
+    let skipped = false;
+    while (currentIndex < targetChars.length && shouldAutoSkipCharacter(targetChars[currentIndex])) {
+      currentIndex++;
+      skipped = true;
+    }
+    return skipped;
+  }
+
   // --- Render Target ---
   function renderTarget() {
     if (!isPlaying) return;
@@ -220,7 +232,7 @@
       let cls = 'waiting';
 
       if (i < currentIndex) {
-        cls = 'done';
+        cls = shouldAutoSkipCharacter(ch) ? 'done auto-skipped' : 'done';
       } else if (audioDictationEnabled) {
         cls = 'waiting dictation-hidden';
       } else if (i === currentIndex && highlightEnabled) {
@@ -236,14 +248,14 @@
     
     let currentUnitTitle = currentMode === 'sentences' ? nceSentences[selectedLesson].title : '⭐ 收藏夹';
     html += '<div class="word-info"><strong>' + currentUnitTitle + '</strong> &nbsp;•&nbsp; ' + (queueIndex + 1) + ' / ' + challengeQueue.length + '</div>';
-    html += '<div class="input-hint">在键盘上按下对应的键 ⬆️ (系统会自动跳过符号和空格)</div>';
+    html += '<div class="input-hint">在键盘上按下对应的键 ⬆️（系统会自动跳过符号、数字和空格）</div>';
 
     const prevDisabled = queueIndex === 0;
     const nextDisabled = queueIndex >= challengeQueue.length - 1;
     
     html += '<div class="nav-target-buttons" style="display:flex; justify-content:center; gap: 20px; margin-top: 15px;">';
-    html += `<button id="btnPrevTarget" style="padding: 5px 15px; border-radius: 15px; border: 1px solid var(--primary-color); background: transparent; color: var(--primary-color); cursor: ${prevDisabled ? 'not-allowed' : 'pointer'}; opacity: ${prevDisabled ? '0.5' : '1'}; transition: all 0.2s;" ${prevDisabled ? 'disabled' : ''}>⬅️ 上一个</button>`;
-    html += `<button id="btnNextTarget" style="padding: 5px 15px; border-radius: 15px; border: 1px solid var(--primary-color); background: transparent; color: var(--primary-color); cursor: ${nextDisabled ? 'not-allowed' : 'pointer'}; opacity: ${nextDisabled ? '0.5' : '1'}; transition: all 0.2s;" ${nextDisabled ? 'disabled' : ''}>下一个 ➡️</button>`;
+    html += `<button id="btnPrevTarget" style="padding: 5px 15px; border-radius: 15px; border: 1px solid var(--primary-color); background: transparent; color: var(--primary-color); cursor: ${prevDisabled ? 'not-allowed' : 'pointer'}; opacity: ${prevDisabled ? '0.5' : '1'}; transition: all 0.2s;" ${prevDisabled ? 'disabled' : ''}>⬅️ 上一条</button>`;
+    html += `<button id="btnNextTarget" style="padding: 5px 15px; border-radius: 15px; border: 1px solid var(--primary-color); background: transparent; color: var(--primary-color); cursor: ${nextDisabled ? 'not-allowed' : 'pointer'}; opacity: ${nextDisabled ? '0.5' : '1'}; transition: all 0.2s;" ${nextDisabled ? 'disabled' : ''}>下一条 ➡️</button>`;
     html += '</div>';
 
     practiceArea.innerHTML = html;
@@ -281,12 +293,15 @@
   function generateSentencesChallenge(lessonNum) {
     const lessonData = nceSentences[lessonNum];
     if (!lessonData) return [];
-    const items = [...(lessonData[selectedType] || [])];
+    const items = [
+      ...(Array.isArray(lessonData.phrases) ? lessonData.phrases : []),
+      ...(Array.isArray(lessonData.sentences) ? lessonData.sentences : [])
+    ];
     for (let i = items.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [items[i], items[j]] = [items[j], items[i]];
     }
-    return items.map(w => ({ text: w.en, cn: w.cn }));
+    return items.map(w => ({ text: w.en, cn: w.cn, kind: 'sentence' }));
   }
 
   function generateFavoritesChallenge() {
@@ -300,7 +315,7 @@
       const j = Math.floor(Math.random() * (i + 1));
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
-    return shuffled.map(w => ({ text: w.en, cn: w.cn, lesson: w.lesson }));
+    return shuffled.map(w => ({ text: w.en, cn: w.cn, lesson: w.lesson, kind: 'sentence' }));
   }
 
   // --- Start Game ---
@@ -341,16 +356,38 @@
     currentIndex = 0;
     currentWrongCount = 0;
     currentWordHadError = false;
-
-    while (currentIndex < targetChars.length && !/^[a-zA-Z]$/.test(targetChars[currentIndex])) {
-      currentIndex++;
-    }
-
+    advanceAutoSkippedCharacters();
     renderTarget();
+
+    if (currentIndex >= targetChars.length) {
+      completeCurrentTarget();
+      return;
+    }
 
     if (audioDictationEnabled) {
       window.playDictationWord(item.text);
     }
+  }
+
+  function completeCurrentTarget() {
+    queueIndex++;
+    const currentWord = challengeQueue[queueIndex - 1];
+    let delay = 300;
+
+    if (!currentWordHadError) {
+      recordFavCorrect(currentWord.text);
+    } else {
+      challengeQueue.splice(queueIndex, 0, currentWord);
+    }
+
+    if (!audioDictationEnabled) {
+      window.playDictationWord(currentWord.text);
+      delay = 1500;
+    } else {
+      delay = 600;
+    }
+
+    setTimeout(() => loadNextTarget(), delay);
   }
 
   // --- Handle Key Press ---
@@ -359,12 +396,11 @@
     if (e.ctrlKey || e.metaKey || e.altKey) return;
     const key = e.key;
     if (key.length !== 1) return;
+    const expected = targetChars[currentIndex];
+    if (!expected) return;
     e.preventDefault();
     totalKeys++;
 
-    const expected = targetChars[currentIndex];
-
-    // For punctuation, matching should be exact but case insensitive is fine for letters
     const isCorrect = key.toLowerCase() === expected.toLowerCase();
 
     if (isCorrect) {
@@ -390,35 +426,13 @@
       }
 
       currentIndex++;
-
-      while (currentIndex < targetChars.length && !/^[a-zA-Z]$/.test(targetChars[currentIndex])) {
-        const skipEl = $('#char-' + currentIndex);
-        if (skipEl) {
-          skipEl.classList.remove('current', 'waiting', 'dictation-hidden', 'reveal-hint');
-          skipEl.classList.add('done');
-        }
-        currentIndex++;
-      }
+      const skipped = advanceAutoSkippedCharacters();
 
       if (currentIndex >= targetChars.length) {
-        queueIndex++;
-        const currentWord = challengeQueue[queueIndex - 1];
-        let delay = 300;
-
-        if (!currentWordHadError) {
-          recordFavCorrect(currentWord.text);
-        } else {
-          challengeQueue.splice(queueIndex, 0, currentWord);
-        }
-
-        if (!audioDictationEnabled) {
-          window.playDictationWord(currentWord.text);
-          delay = 1500;
-        } else {
-          delay = 600;
-        }
-
-        setTimeout(() => loadNextTarget(), delay);
+        if (skipped) renderTarget();
+        completeCurrentTarget();
+      } else if (skipped) {
+        renderTarget();
       } else {
         const nextEl = $('#char-' + currentIndex);
         if (highlightEnabled) {
@@ -573,10 +587,10 @@
 
     let html = '<div class="favorites-list">';
     html += '<h3>⭐ 收藏夹</h3>';
-    html += '<p class="fav-subtitle">打字出错的句子会自动添加到这里 · 累计正确5次自动掌握 ✨</p>';
+    html += '<p class="fav-subtitle">打字出错的短语和例句会自动添加到这里 · 累计正确5次自动掌握 ✨</p>';
 
     if (favs.length === 0) {
-      html += '<div class="fav-empty">还没有收藏的句子 👍<br>继续保持！</div>';
+      html += '<div class="fav-empty">还没有收藏的短语和例句 👍<br>继续保持！</div>';
     } else {
       const groups = {};
       favs.forEach(f => {
@@ -620,7 +634,7 @@
       }
       html += `
         <div class="fav-actions">
-          <button id="btnPracticeFavs">📝 练习${selectedFavLesson === 'all' ? '全部' : '当前筛选'}句子</button>
+          <button id="btnPracticeFavs">📝 练习${selectedFavLesson === 'all' ? '全部' : '当前筛选'}短语和例句</button>
           <button id="btnClearFavs" class="danger">🗑️ 清空全部</button>
         </div>`;
     }
@@ -652,7 +666,7 @@
     const btnClear = $('#btnClearFavs');
     if (btnClear) {
       btnClear.addEventListener('click', () => {
-        if (confirm('确定要清空所有收藏的句子吗？')) {
+        if (confirm('确定要清空所有收藏的短语和例句吗？')) {
           clearAllFavorites();
           renderFavorites();
         }
@@ -668,8 +682,6 @@
 
     $$('.mode-tab').forEach(tab => tab.classList.toggle('active', tab.dataset.mode === mode));
     lessonSelector.classList.toggle('show', mode === 'sentences');
-    const typeSelector = $('#typeSelector');
-    if (typeSelector) typeSelector.style.display = (mode === 'sentences') ? 'flex' : 'none';
     highlightToggleBar.style.display = (mode === 'favorites') ? 'none' : 'flex';
     highlightToggleBar.classList.toggle('show-display-toggles', mode === 'sentences');
 
@@ -684,34 +696,92 @@
     practiceArea.innerHTML = `
       <div class="start-prompt">
         <h3>📝 短语与例句</h3>
-        <p>看中文提示，打出英文短语和句子<br>注意大小写，系统会自动跳过标点符号和空格！</p>
+        <p>看中文提示，打出英文短语和句子<br>注意大小写，系统会自动跳过符号、数字和空格！</p>
         <button class="btn-start" id="btnStart">开 始 练 习</button>
       </div>
     `;
     $('#btnStart').addEventListener('click', startGame);
   }
 
-  // --- Build Lesson Selector ---
+  // --- Build Grade and Unit Selector ---
+  const GRADE_ORDER = ['三年级上', '三年级下', '四年级上'];
+
+  function getGradeName(title, lesson) {
+    if (title.startsWith('三上')) return '三年级上';
+    if (title.startsWith('三下')) return '三年级下';
+    if (title.startsWith('四上')) return '四年级上';
+    // The original sentence data (Units 1–8) belongs to the third-grade lower term.
+    if (Number(lesson) >= 1 && Number(lesson) <= 8) return '三年级下';
+    return '其他';
+  }
+
+  function getUnitLabel(title, fallbackIndex) {
+    const match = title.match(/Unit\s*(\d+)/i);
+    if (match) return `Unit ${match[1]}`;
+    if (/Review/i.test(title)) return 'Review';
+    return `Unit ${fallbackIndex}`;
+  }
+
   function buildLessonSelector() {
     const sortedKeys = Object.keys(nceSentences).map(Number).sort((a, b) => a - b);
+    const groupEntries = GRADE_ORDER.slice();
+    const groupMap = {};
+    GRADE_ORDER.forEach(groupName => { groupMap[groupName] = []; });
 
-    let barHtml = '<div class="lesson-detail-bar" id="lessonDetailBar">';
     sortedKeys.forEach(key => {
-      const isActive = key === selectedLesson ? 'active' : '';
-      barHtml += `<button class="lesson-btn ${isActive}" data-lesson="${key}" style="width: auto; padding: 10px 20px;">${nceSentences[key].title}</button>`;
+      const title = nceSentences[key].title || '';
+      const groupName = getGradeName(title, key);
+      if (!groupMap[groupName]) {
+        groupMap[groupName] = [];
+        groupEntries.push(groupName);
+      }
+      groupMap[groupName].push(key);
     });
-    barHtml += '</div>';
 
+    let barHtml = '<div class="lesson-groups-bar">';
+    groupEntries.forEach(name => {
+      barHtml += `<button class="lesson-group-btn" data-group="${name}">${name}</button>`;
+    });
+    barHtml += '</div><div class="lesson-detail-bar" id="lessonDetailBar"></div>';
     lessonSelector.innerHTML = barHtml;
+    lessonSelector.classList.add('show');
 
-    $$('.lesson-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        selectedLesson = parseInt(btn.dataset.lesson);
-        $$('.lesson-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        if (isPlaying) startGame();
+    const detailBar = $('#lessonDetailBar');
+
+    function showGroup(groupName) {
+      $$('.lesson-group-btn').forEach(b => b.classList.toggle('active', b.dataset.group === groupName));
+      const keys = groupMap[groupName] || [];
+      let html = '';
+      keys.forEach(key => {
+        const isActive = key === selectedLesson ? 'active' : '';
+        const unitLabel = getUnitLabel(nceSentences[key].title || '', keys.indexOf(key) + 1);
+        html += `<button class="lesson-btn ${isActive}" data-lesson="${key}" title="${unitLabel}">${unitLabel}</button>`;
       });
+      if (keys.length === 0) html = '<span class="lesson-empty">这个年级暂未录入短语和例句</span>';
+      detailBar.innerHTML = html;
+
+      $$('.lesson-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          selectedLesson = parseInt(btn.dataset.lesson);
+          $$('.lesson-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          if (isPlaying) startGame();
+        });
+      });
+    }
+
+    $$('.lesson-group-btn').forEach(btn => {
+      btn.addEventListener('click', () => showGroup(btn.dataset.group));
     });
+
+    let defaultGroup = groupEntries[0] || '三年级上';
+    for (const groupName in groupMap) {
+      if (groupMap[groupName].includes(selectedLesson)) {
+        defaultGroup = groupName;
+        break;
+      }
+    }
+    showGroup(defaultGroup);
   }
 
   // --- Init ---
@@ -729,15 +799,6 @@
 
     $$('.mode-tab').forEach(tab => {
       tab.addEventListener('click', () => setMode(tab.dataset.mode));
-    });
-
-    $$('.type-tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        selectedType = tab.dataset.type;
-        $$('.type-tab').forEach(b => b.classList.remove('active'));
-        tab.classList.add('active');
-        if (isPlaying) startGame();
-      });
     });
 
     btnStart.addEventListener('click', startGame);
